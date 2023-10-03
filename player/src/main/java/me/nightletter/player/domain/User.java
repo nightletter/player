@@ -1,11 +1,10 @@
 package me.nightletter.player.domain;
 
-import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
+import java.util.List;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -19,7 +18,10 @@ public class User {
 	@Id
 	private Long userId;
 
-	public String name;
+	private String name;
+
+	@OneToMany
+	private List<Ticket> tickets;
 
 	public User( Long userId, String name ) {
 		this.userId = userId;
