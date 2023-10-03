@@ -1,9 +1,11 @@
 package me.nightletter.player.service;
 
 import lombok.RequiredArgsConstructor;
+import me.nightletter.player.domain.Ticket;
 import me.nightletter.player.domain.User;
 import me.nightletter.player.domain.Video;
 import me.nightletter.player.domain.VideoLog;
+import me.nightletter.player.repository.TicketRepository;
 import me.nightletter.player.repository.UserRepository;
 import me.nightletter.player.repository.VideoLogRepository;
 import me.nightletter.player.repository.VideoRepository;
@@ -16,9 +18,14 @@ public class PlayerService {
 	private final UserRepository userRepository;
 	private final VideoRepository videoRepository;
 	private final VideoLogRepository videoLogRepository;
+	private final TicketRepository ticketRepository;
 
 	public Long begin(Long userId, Long videoId) {
 		User findUser = getUser( userId );
+
+		Ticket findTicket = ticketRepository.findByUserId( findUser.getUserId() )
+			.orElseThrow( () -> new IllegalArgumentException() );
+
 		Video findVideo = getVideo( videoId );
 
 		VideoLog begin = VideoLog.begin( findVideo.getVideoId(), findUser.getUserId() );
