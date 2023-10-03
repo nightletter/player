@@ -36,6 +36,7 @@
     .then(res => console.log('begin'))
     .catch((error) => {
       alert("플레이어 진입에 실패했습니다.")
+      window.location.href = '/';
     });
   }
 
@@ -52,6 +53,7 @@
     })
     .catch((error) => {
       console.error("error :" + playInterval, error);
+      window.location.href = '/';
     });
   }
 </script>
