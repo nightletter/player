@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8">
+  <title>player</title>
+  <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+</head>
+<body>
+<p>PLAYING</p>
+<p th:text="${video}">
+</body>
+</html>
+
+
+<script>
+  window.onload = () => {
+    begin();
+    let playInterval = 0;
+    const videoId = new URLSearchParams(window.location.search).get('videoId');
+
+    const sendVideoLog = setInterval(() => {
+      playInterval += 1;
+
+      if (playInterval % 100 === 0) {
+        play(playInterval, videoId);
+      }
+
+    }, 10);
+  };
+
+  function begin() {
+    const videoId = new URLSearchParams(window.location.search).get('videoId');
+    const requestUrl = '/player/begin/' + videoId;
+
+    axios.post(requestUrl)
+    .then(res => console.log('begin'))
+    .catch((error) => {
+      alert("플레이어 진입에 실패했습니다.")
+      window.location.href = '/';
+    });
+  }
+
+  function play(playInterval, videoId) {
+    const requestUrl = '/player/play/' + videoId;
+
+    axios.post(requestUrl, null, {
+      params: {
+        playTime: playInterval
+      }
+    })
+    .then((response) => {
+      console.log("success :" + playInterval);
+    })
+    .catch((error) => {
+      console.error("error :" + playInterval, error);
+      window.location.href = '/';
+    });
+  }
+</script>
