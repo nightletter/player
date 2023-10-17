@@ -12,30 +12,48 @@ import org.springframework.web.reactive.function.client.WebClient;
 @Slf4j
 public class LogService {
 
-	private final LogRepository logRepository;
-	private final WebClient.Builder webClientBuilder;
+    private final LogRepository logRepository;
+    private final WebClient.Builder webClientBuilder;
 
-	public void begin(Long userId, Long videoId) {
+    public String begin(Long userId, Long videoId) {
 
-		UserResponse findUser = webClientBuilder.build().get()
-			.uri( "http://user-service/api/users/" + userId )
-			.retrieve()
-			.bodyToMono( UserResponse.class )
-			.block();
+        UserResponse findUser = webClientBuilder.build().get()
+                .uri("http://user-service/api/users/" + userId)
+                .retrieve()
+                .bodyToMono(UserResponse.class)
+                .block();
 
-		VideoResponse findVideo = webClientBuilder.build().get()
-			.uri( "http://video-service/api/video/" + videoId )
-			.retrieve()
-			.bodyToMono( VideoResponse.class )
-			.block();
+        VideoResponse findVideo = webClientBuilder.build().get()
+                .uri("http://video-service/api/video/" + videoId)
+                .retrieve()
+                .bodyToMono(VideoResponse.class)
+                .block();
 
-		log.info( findUser.getUserId().toString() );
-		log.info( findVideo.getVideoId().toString() );
+        log.info(findUser.getUserId().toString());
+        log.info(findVideo.getVideoId().toString());
 
-		logRepository.save( Log.begin( userId, videoId ) );
-	}
+        try {
+            logRepository.save(Log.begin(userId, videoId));
+        } catch (RuntimeException e) {
+            throw new RuntimeException();
+        }
 
-	public void play(Long userId, Long videoId, Integer playTime) {
-		logRepository.save( Log.play( userId, videoId, playTime ) );
-	}
+        return "saved log";
+    }
+
+    public void play(Long userId, Long videoId, Integer playTime) {
+        UserResponse findUser = webClientBuilder.build().get()
+                .uri("http://user-service/api/users/" + userId)
+                .retrieve()
+                .bodyToMono(UserResponse.class)
+                .block();
+
+        VideoResponse findVideo = webClientBuilder.build().get()
+                .uri("http://video-service/api/video/" + videoId)
+                .retrieve()
+                .bodyToMono(VideoResponse.class)
+                .block();
+
+        logRepository.save(Log.play(findUser.getUserId(), findVideo.getVideoId(), playTime));
+    }
 }
