@@ -1,5 +1,6 @@
 package me.nightletter.logservice;
 
+import io.github.resilience4j.circuitbreaker.annotation.CircuitBreaker;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -12,26 +13,31 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/api/log")
 public class LogRestController {
 
-	private final LogService logService;
+    private final LogService logService;
 
-	@PostMapping("/begin")
-	public ResponseEntity begin( @RequestParam Long userId,
-	                             @RequestParam Long videoId) {
+    @PostMapping("/begin")
+	@CircuitBreaker(name = "beginLog", fallbackMethod = "beginFallbackMethod")
+    public ResponseEntity begin(@RequestParam Long userId,
+                                @RequestParam Long videoId) {
 
-		logService.begin( userId, videoId );
+        logService.begin(userId, videoId);
 
-		return ResponseEntity.ok()
-			.build();
-	}
+        return ResponseEntity.ok()
+                .build();
+    }
 
-	@PostMapping("/play")
-	public ResponseEntity begin( @RequestParam Long userId,
-	                             @RequestParam Long videoId,
-	                             @RequestParam Integer playTime) {
+    public ResponseEntity beginFallbackMethod(Long userId, Long videoId, RuntimeException e) {
+		return ResponseEntity.ok("Oops !! userId=" + userId + ", videoId=" + videoId);
+    }
 
-		logService.play( userId, videoId, playTime );
+    @PostMapping("/play")
+    public ResponseEntity begin(@RequestParam Long userId,
+                                @RequestParam Long videoId,
+                                @RequestParam Integer playTime) {
 
-		return ResponseEntity.ok()
-			.build();
-	}
+        logService.play(userId, videoId, playTime);
+
+        return ResponseEntity.ok()
+                .build();
+    }
 }
