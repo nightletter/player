@@ -18,6 +18,7 @@ public class LogService {
     public String begin(Long userId, Long videoId) {
 
         UserResponse findUser = webClientBuilder.build().get()
+//            특정 서비스의 URL이 아닌 로드벨런서에 요청, discovery-client 그룹에 요청
                 .uri("http://user-service/api/users/" + userId)
                 .retrieve()
                 .bodyToMono(UserResponse.class)
